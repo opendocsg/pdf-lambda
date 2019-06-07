@@ -46,5 +46,5 @@ As such, to modify things like HTTP status codes, error messages, input validati
 It is not difficult to change this to a Lambda Proxy integration if one wishes to *access the requests and responses directly* in the Lambda function.
 ## Troubleshooting
  - Ensure that memory allocated to `create_pdf` is at least 512MB.
- - Ensure that timeout is at least 15 seconds.
+ - Ensure that timeout is at least 15 seconds. Check CloudWatch logs to see if any of the Lambda instances terminate due to timeout.
  - If AWS API Gateway (different from AWS Lambda Management Console) settings were modified, ensure that the API has been re-deployed.
