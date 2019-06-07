@@ -6,7 +6,7 @@ const UNDEF_MSG = 'This is a blank page.' // message if HTML cannot be found
 
 // To configure, refer to:
 // https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
-const OPTIONS = {
+const PDF_OPTIONS = {
     printBackground: true,
     format: 'A4',
     displayHeaderFooter: false,
@@ -21,11 +21,11 @@ const OPTIONS = {
 }
 
 exports.createpdf = async (event, context, callback) => {
-    const html = event.serializedDom !== undefined ? 
-        event.serializedDom : 
-        `<!DOCTYPE html><html>${ UNDEF_MSG }</html>`
+    const html = event.serializedDom !== undefined ?
+        event.serializedDom :
+        `<!DOCTYPE html><html>${UNDEF_MSG}</html>`
 
-    const options = {
+    const pup_options = {
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
         executablePath: await chromium.executablePath,
@@ -33,21 +33,34 @@ exports.createpdf = async (event, context, callback) => {
     }
     let browser = null
     try {
-        browser = await puppeteer.launch(options)
+        browser = await puppeteer.launch(pup_options)
         const page = await browser.newPage()
+
+        // External resources must be present in assets folder or outside
+        await page.setRequestInterception(true);
+        page.on('request', request => {
+            if (!request.url().startsWith('./assets') && !request.url().startsWith('http')) {
+                request.abort();
+            } else {
+                request.continue();
+            }
+        })
+
+        // Set HTML
         await page.setContent(html, {
             timeout: TIMEOUT,
             waitUntil: ['networkidle0', 'load', 'domcontentloaded'],
         })
 
         // Apply the CSS manually
-        await page.addStyleTag({path: 'createpdf/assets/styles/normalize.css'})
-        await page.addStyleTag({path: 'createpdf/assets/styles/main.css'})
+        await page.addStyleTag({ path: 'createpdf/assets/styles/normalize.css' })
+        await page.addStyleTag({ path: 'createpdf/assets/styles/main.css' })
 
-        const pdf = await page.pdf(OPTIONS)
+        const pdf = await page.pdf(PDF_OPTIONS)
 
         // Do not use callbacks on AWS Lambda w/ Node 8
         return pdf.toString('base64')
+
     } catch (error) {
         throw new Error('Error: ' + error)
     } finally {
