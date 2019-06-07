@@ -4,6 +4,7 @@ Allows an authorized user to generate a PDF from [serialized HTML](https://githu
 
 ## How to use
 1. Obtain a API key from the AWS API Gateway
+2. Make a POST request as shown in step 1 below.
 
 ## How it works
 1. The Opendoc Netlify build process makes a POST request to `create_pdf` with the serialized HTML as the body, formatted as such
