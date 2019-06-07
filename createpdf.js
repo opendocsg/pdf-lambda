@@ -1,7 +1,7 @@
 const chromium = require('chrome-aws-lambda')
 const puppeteer = require('puppeteer-core')
 
-const TIMEOUT = 10000 // in milliseconds
+const TIMEOUT = 15000 // in milliseconds
 const UNDEF_MSG = 'This is a blank page.' // message if HTML cannot be found
 
 // To configure, refer to:
