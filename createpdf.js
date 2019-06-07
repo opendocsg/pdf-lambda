@@ -4,7 +4,7 @@ const puppeteer = require('puppeteer-core')
 const TIMEOUT = 10000 // in milliseconds
 const UNDEF_MSG = 'This is a blank page.' // message if HTML cannot be found
 
-// To modify, refer to:
+// To configure, refer to:
 // https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
 const OPTIONS = {
     printBackground: true,

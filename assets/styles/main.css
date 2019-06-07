@@ -327,9 +327,9 @@ body.menu-toggled .site-nav { left: 0; box-shadow: 7px 0 13px 5px rgba(0, 0, 0, 
 .highlight .il { color: #009999; }
 
 #print-content { /* print styles go here */ }
-#print-content .site-header-text { color: #17335f; font-family: "Noto Sans", sans-serif; font-size: 40px; }
-#print-content #document-title { color: #17335f; margin-bottom: 30px; font-size: 30px; }
-#print-content #main-content { padding-left: 0; padding-right: 0; padding-top: 0; margin-top: -40px; position: relative; font-size: 18px; }
+#print-content .site-header-text { color: #17335f; font-family: "Noto Sans", sans-serif; font-size: 30px; }
+#print-content #document-title { color: #17335f; margin-bottom: 30px; font-size: 20px; }
+#print-content #main-content { padding-left: 0; padding-right: 0; padding-top: 0; margin-top: -40px; position: relative; font-size: 15px; }
 
 @media print { @page { size: A4; margin: 1.5cm; }
   .site-main { height: auto; left: 0; top: 0; position: relative; padding-top: 20px; padding-bottom: 20px; }
