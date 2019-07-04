@@ -1,6 +1,13 @@
 # `create_pdf` Lambda function
+**Status of latest deployment to `prod` branch:** ![build status](https://travis-ci.com/opendocsg/pdf-lambda.svg?branch=prod)  
+**Status of latest deployment to `dev` branch:** &nbsp;&nbsp;![build status](https://travis-ci.com/opendocsg/pdf-lambda.svg?branch=dev)  
+(if the above is failing, it does not mean that the Lambda function is failing, just that the latest commit did not deploy.)  
+
 Allows an authorized user to generate a PDF from [serialized HTML](https://github.com/jsdom/jsdom#serializing-the-document-with-serialize).
 #### Resource URL `create_pdf`: https://9lt0883lre.execute-api.ap-southeast-1.amazonaws.com/default/create_pdf
+
+## Deployment
+Travis CI is used only for continous deployment to AWS Lambda. Any commit to either `dev`/`prod` trigger a deployment. The branch code will be uploaded, published as a new version and `dev`/`prod` will be aliased to that new version.  
 
 ## How to use
 1. Obtain a API key from the AWS API Gateway

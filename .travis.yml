@@ -10,5 +10,4 @@ branches:
 before_install:
 - pip install --user awscli
 script: 
-  - ls
   - bash ./deploy.sh
