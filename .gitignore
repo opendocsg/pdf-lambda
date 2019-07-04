@@ -4,3 +4,6 @@ jspm_packages
 
 # Serverless directories
 .serverless
+
+# deployment package
+code.zip
