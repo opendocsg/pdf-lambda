@@ -1,7 +1,7 @@
 #!/bin/bash
 # Required: set environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
 # This script does:
-# 1. publish a new lambda version, say version=X
+# 1. zip, upload, and publish a new lambda version, say version=X
 # 2. if dev/prod branch, alias dev/prod to version=X (not $LATEST which always points to latest)
 set -ev
 if [[ ($TRAVIS_BRANCH != 'dev') && ($TRAVIS_BRANCH != 'prod') ]]; then

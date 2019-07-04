@@ -2,14 +2,18 @@
 
 const chromium = require('chrome-aws-lambda')
 const puppeteer = require('puppeteer-core')
+const fs = require('fs')
 const AWS = require('aws-sdk')
-const s3 = new AWS.s3()
+const s3 = new AWS.S3()
 
 const HASH_HEADER_NAME = 'x-amz-html-hash' // must start with x-amz
+const TEMP_PDF_FILEPATH = '/tmp/temp.pdf' // On Lambda, writes can only be done in /tmp
 const TIMEOUT = 30000 // in milliseconds
+
 // To configure, refer to:
 // https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
 const PDF_OPTIONS = {
+    path: TEMP_PDF_FILEPATH,
     printBackground: true,
     format: 'A4',
     displayHeaderFooter: false,
@@ -23,28 +27,23 @@ const PDF_OPTIONS = {
     }
 }
 
-console.log('Loading handler function');
-
 const respondWith = (code, headers, responseBody) => {
     // The response must be formatted as such or else 502 will be returned
     const response = {
-        statusCode: code,
-        headers: headers,
-        body: JSON.stringify(responseBody),
-        isBase64Encoded: false
+        "statusCode": code,
+        "headers": headers,
+        "body": JSON.stringify(responseBody),
+        "isBase64Encoded": false
     }
-    console.log("response: " + JSON.stringify(response))
     return response
 }
  
 exports.handler = async (event) => {
-
-    console.log("request: " + JSON.stringify(event))
     if (event.httpMethod !== 'POST') {
         return respondWith(405, {}, 'Only POST supported')
     }
     if (!event.body) {
-        return responseWith(400, {}, 'Missing body')
+        return respondWith(400, {}, 'Missing body')
     }
     const body = JSON.parse(event.body)
     if (!body.serializedHTML || 
@@ -87,10 +86,7 @@ exports.handler = async (event) => {
         //await page.addStyleTag({ path: 'createpdf/assets/styles/normalize.css' })
         //await page.addStyleTag({ path: 'createpdf/assets/styles/main.css' })
 
-        const pdf = await page.pdf(PDF_OPTIONS)
-
-        // Do not use callbacks on AWS Lambda w/ Node 8
-        pdfbase64 = pdf.toString('base64')
+        await page.pdf(PDF_OPTIONS)
     } catch (error) {
         return respondWith(500, {}, error)
     }
@@ -98,26 +94,31 @@ exports.handler = async (event) => {
         await browser.close()
     }
 
-    if (!pdfbase64) {
-        return respondWith(500, {}, 'Uncaught error before upload. The PDF was not successfully generated')
-    }
+    const pdfBin = fs.readFileSync(TEMP_PDF_FILEPATH)
 
     // Then upload the PDF to s3
     const uploadParams = {
         'Bucket': body.bucketName,
+        'ACL': 'public-read',
         'Key': body.serializedHTMLName,
         'Metadata': {
             [HASH_HEADER_NAME]: body.serializedHTMLHash
         },
-        'Body': pdfbase64
+        'Body': pdfBin
     }
-    s3.upload(uploadParams, function(err, data) {
-        if (err) {
-            return respondWith(500, {}, 'Upload error:' + err)
-        }
-        if (data) {
-            return respondWith(200, {}, 'Completed successfully')
-        }
-        return responseWith(500, {}, 'Uncaught error at upload')
+    const uploadPromise = new Promise(function(resolve, reject) {
+        s3.upload(uploadParams, function(err, data) {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(data)
+            }
+        })
     })
+    const res = await uploadPromise
+    if (res.ETag) {
+        return respondWith(200, {}, res)
+    } else {
+        return respondWith(500, {}, res)
+    }
 }
