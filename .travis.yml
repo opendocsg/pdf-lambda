@@ -1,4 +1,14 @@
-language: ruby
-rvm:
- - 2.2
- - jruby
+language: node_js
+node_js:
+  - "8.10"
+env:
+  global:
+  - AWS_DEFAULT_REGION=ap-southeast-1
+branches:
+  only:
+  - dev
+before_install:
+- pip install --user awscli
+script: 
+  - ls
+  - bash ./deploy.sh
