@@ -1,6 +1,6 @@
 # Create PDF
-**Status of latest deployment from `prod` branch:** [![Build Status](https://travis-ci.com/opendocsg/pdf-lambda.svg?branch=prod)](https://travis-ci.com/opendocsg/pdf-lambda)
-**Status of latest deployment from `dev` branch:** &nbsp;&nbsp;[![Build Status](https://travis-ci.com/opendocsg/pdf-lambda.svg?branch=dev)](https://travis-ci.com/opendocsg/pdf-lambda)  
+**Status of latest deployment from `prod` branch:** [![Build Status](https://travis-ci.com/opendocsg/pdf-lambda.svg?branch=prod)](https://travis-ci.com/opendocsg/pdf-lambda)  
+**Status of latest deployment from `dev` branch:** &nbsp;[![Build Status](https://travis-ci.com/opendocsg/pdf-lambda.svg?branch=dev)](https://travis-ci.com/opendocsg/pdf-lambda)  
 (if the above is failing, it does not imply that the Lambda function is failing)  
 
 ## Overview
