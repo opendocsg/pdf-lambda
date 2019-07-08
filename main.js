@@ -6,7 +6,7 @@ const fs = require('fs')
 const AWS = require('aws-sdk')
 const s3 = new AWS.S3()
 
-const HASH_HEADER_NAME = 'x-amz-html-hash' // must start with x-amz
+const HASH_HEADER_NAME = 'x-amz-meta-html-hash' // must start with x-amz-meta
 const TEMP_PDF_FILEPATH = '/tmp/temp.pdf' // On Lambda, writes can only be done in /tmp
 const TIMEOUT = 30000 // in milliseconds
 
