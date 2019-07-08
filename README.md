@@ -4,7 +4,7 @@
 (if the above is failing, it does not imply that the Lambda function is failing)  
 
 ## Overview
-Turns [serialized HTML](https://github.com/jsdom/jsdom#serializing-the-document-with-serialize) into PDF, then pushes it onto S3.  
+Turns [serialized HTML](https://github.com/jsdom/jsdom#serializing-the-document-with-serialize) into PDF, then pushes it into an S3 Bucket.  
 ##### Prod URL https://4c08rjv4pa.execute-api.ap-southeast-1.amazonaws.com/prod/create_pdf_2
 ##### Dev URL https://4c08rjv4pa.execute-api.ap-southeast-1.amazonaws.com/dev/create_pdf_2
 
@@ -20,7 +20,7 @@ curl -X POST \
         "serializedHTMLHash": "...",  #--> Will be stored as Object metadata. Will be sent in the headers in subsequent requests.
         "bucketName":"..." }'         #--> S3 Bucket
 ```
-
+3. The PDF will be 
 ## How to develop
 1. Make the modification.
 2. Push to dev branch. Wait 1-2 minutes for it to deploy...
