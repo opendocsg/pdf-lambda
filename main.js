@@ -6,7 +6,7 @@ const fs = require('fs')
 const AWS = require('aws-sdk')
 const s3 = new AWS.S3()
 
-const HASH_HEADER_NAME = 'html-hash' // must start with x-amz-meta
+const HASH_HEADER_NAME = 'html-hash' // Once uploaded, this will be prepended with x-amz-meta-
 const TEMP_PDF_FILEPATH = '/tmp/temp.pdf' // On Lambda, writes can only be done in /tmp
 const TIMEOUT = 30000 // in milliseconds
 
@@ -17,14 +17,12 @@ const PDF_OPTIONS = {
     printBackground: true,
     format: 'A4',
     displayHeaderFooter: false,
-    height: '594mm',        // allowed units: mm, cm, in, px
-    width: '420mm',
     margin: {
         right: '100px', // default is 0, units: mm, cm, in, px
         left: '100px',
         top: '80px',
         bottom: '80px'
-    }
+    },
 }
 
 const respondWith = (code, headers, responseBody) => {
@@ -60,11 +58,11 @@ exports.handler = async (event) => {
         headless: chromium.headless,
     }
     let browser = null
-    let pdfbase64 = null
     // Generate the PDF with pupeeteer
     try {
         browser = await puppeteer.launch(pupeeteerOptions)
         const page = await browser.newPage()
+
 
         // External resources must be present in assets folder or outside
         await page.setRequestInterception(true);
@@ -79,12 +77,8 @@ exports.handler = async (event) => {
         // Set HTML
         await page.setContent(body.serializedHTML, {
             timeout: TIMEOUT,
-            waitUntil: ['networkidle0', 'load', 'domcontentloaded'],
+            waitUntil: 'load'
         })
-
-        // Apply the CSS manually
-        //await page.addStyleTag({ path: 'createpdf/assets/styles/normalize.css' })
-        //await page.addStyleTag({ path: 'createpdf/assets/styles/main.css' })
 
         await page.pdf(PDF_OPTIONS)
     } catch (error) {
