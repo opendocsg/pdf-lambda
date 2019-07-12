@@ -63,7 +63,6 @@ exports.handler = async (event) => {
         browser = await puppeteer.launch(pupeeteerOptions)
         const page = await browser.newPage()
 
-
         // External resources must be present in assets folder or outside
         await page.setRequestInterception(true);
         page.on('request', request => {
@@ -77,7 +76,7 @@ exports.handler = async (event) => {
         // Set HTML
         await page.setContent(body.serializedHTML, {
             timeout: TIMEOUT,
-            waitUntil: 'load'
+            waitUntil: ['load', 'networkidle0']
         })
 
         await page.pdf(PDF_OPTIONS)
