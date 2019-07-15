@@ -110,8 +110,9 @@ exports.handler = async (event) => {
         })
     })
     const res = await uploadPromise
+    const amz_HASH_HEADER_NAME = 'x-amz-meta-' + HASH_HEADER_NAME
     if (res.ETag) {
-        return respondWith(200, {}, res)
+        return respondWith(200, {}, {...res, [amz_HASH_HEADER_NAME]:body.serializedHTMLHash})
     } else {
         return respondWith(500, {}, res)
     }
