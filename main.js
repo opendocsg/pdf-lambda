@@ -63,22 +63,22 @@ exports.handler = async (event) => {
         browser = await puppeteer.launch(pupeeteerOptions)
         const page = await browser.newPage()
 
-
-        // External resources must be present in assets folder or outside
-        await page.setRequestInterception(true);
-        page.on('request', request => {
-            if (!request.url().startsWith('./assets') && !request.url().startsWith('http')) {
-                request.abort()
-            } else {
-                request.continue()
-            }
-        })
-
         // Set HTML
         await page.setContent(body.serializedHTML, {
             timeout: TIMEOUT,
-            waitUntil: 'load'
+            waitUntil: ['load']
         })
+
+        await page.evaluate(async () => {
+            const selectors = Array.from(document.querySelectorAll("img"));
+            await Promise.all(selectors.map(img => {
+              if (img.complete) return;
+              return new Promise((resolve, reject) => {
+                img.addEventListener('load', resolve);
+                img.addEventListener('error', reject);
+              });
+            }));
+          })
 
         await page.pdf(PDF_OPTIONS)
     } catch (error) {
