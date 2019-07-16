@@ -63,21 +63,22 @@ exports.handler = async (event) => {
         browser = await puppeteer.launch(pupeeteerOptions)
         const page = await browser.newPage()
 
-        // External resources must be present in assets folder or outside
-        await page.setRequestInterception(true);
-        page.on('request', request => {
-            if (!request.url().startsWith('./assets') && !request.url().startsWith('http')) {
-                request.abort()
-            } else {
-                request.continue()
-            }
-        })
-
         // Set HTML
         await page.setContent(body.serializedHTML, {
             timeout: TIMEOUT,
-            waitUntil: ['load', 'networkidle0']
+            waitUntil: ['load']
         })
+
+        await page.evaluate(async () => {
+            const selectors = Array.from(document.querySelectorAll("img"));
+            await Promise.all(selectors.map(img => {
+              if (img.complete) return;
+              return new Promise((resolve, reject) => {
+                img.addEventListener('load', resolve);
+                img.addEventListener('error', reject);
+              });
+            }));
+          })
 
         await page.pdf(PDF_OPTIONS)
     } catch (error) {
@@ -109,8 +110,9 @@ exports.handler = async (event) => {
         })
     })
     const res = await uploadPromise
+    const amz_HASH_HEADER_NAME = 'x-amz-meta-' + HASH_HEADER_NAME
     if (res.ETag) {
-        return respondWith(200, {}, res)
+        return respondWith(200, {}, {...res, [amz_HASH_HEADER_NAME]:body.serializedHTMLHash})
     } else {
         return respondWith(500, {}, res)
     }
